@@ -1,0 +1,41 @@
+plot4 <- function () {
+  library(graphics)
+  library(data.table)
+  data <- read.table("household_power_consumption.txt", header=TRUE, sep=";")
+  data$Date <- as.Date(data$Date, format= "%d/%m/%Y")
+  b <- as.Date("02-02-2007", "%d-%m-%Y")
+  a <- as.Date("01-02-2007", "%d-%m-%Y")
+  subdata <- subset(data, Date >= a & Date <= b)
+  subdata$DT <- paste(subdata$Date, subdata$Time, sep=" ")
+  subdata$DT <- strptime(subdata$DT, format = "%Y-%m-%d %H:%M:%S")
+  rm(data)
+  rm(a)
+  rm(b)
+  subdata$Sub_metering_1 <- as.numeric(paste(subdata$Sub_metering_1))
+  subdata$Sub_metering_2 <- as.numeric(paste(subdata$Sub_metering_2))
+  subdata$Sub_metering_3 <- as.numeric(paste(subdata$Sub_metering_3))
+  subdata$Global_active_power <- as.numeric(paste(subdata$Global_active_power))
+  subdata$Global_reactive_power <- as.numeric(paste(subdata$Global_reactive_power))
+  subdata$Voltage <- as.numeric(paste(subdata$Voltage))
+  png(filename ="plot4.png")
+  par(mfrow = c(2,2))
+  with (subdata, {
+    plot(subdata$DT, subdata$Global_active_power, type="n", ylab = "Global Active Power ( Kilowatts)", xlab="")
+      lines(subdata$DT, subdata$Global_active_power, type="l")
+    plot(subdata$DT, subdata$Voltage, type="n", ylab = "Voltage", xlab="datetime")
+      lines(subdata$DT, subdata$Voltage, type="l")
+    plot(subdata$DT, subdata$Sub_metering_1, type="n", ylab = "Energy sub metering", xlab="")
+      lines(subdata$DT, subdata$Sub_metering_1, type="l")
+      lines(subdata$DT, subdata$Sub_metering_2, type="l", col="red")
+      lines(subdata$DT, subdata$Sub_metering_3, type="l", col="blue")
+      legend("topright", lty=1, legend= c("sub_metering_1","sub_metering_2","sub_metering_3"), col= c("black", "red", "blue"))
+    plot(subdata$DT, subdata$Global_reactive_power, type="n", ylab = "Global_reactive_Power", xlab="datetime")
+      lines(subdata$DT, subdata$Global_reactive_power, type="l")
+      
+    }
+  )
+  
+  rm(subdata)
+  dev.off()
+  
+}
